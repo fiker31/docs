@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "0e4fc961-7840-4fee-ae2c-c5fe821ecbbf",
+		"name": "Payment Gateway Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29016825"
+	},
+	"item": [
+		{
+			"name": "1.Checking if the WEB API Connection Is Working As Required",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://cbebirrpaymentgateway.cbe.com.et:8888/api/cbebpg/CheckCall",
+					"protocol": "https",
+					"host": [
+						"cbebirrpaymentgateway",
+						"cbe",
+						"com",
+						"et"
+					],
+					"port": "8888",
+					"path": [
+						"api",
+						"cbebpg",
+						"CheckCall"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.Checking Data Transfer Model through API",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"TillCode\":870087\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://cbebirrpaymentgateway.cbe.com.et:8888/api/cbebpg/CheckMe",
+					"protocol": "https",
+					"host": [
+						"cbebirrpaymentgateway",
+						"cbe",
+						"com",
+						"et"
+					],
+					"port": "8888",
+					"path": [
+						"api",
+						"cbebpg",
+						"CheckMe"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3.Checking If Decryption Works As Required",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"TillCode\":870087\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://cbebirrpaymentgateway.cbe.com.et:8888/api/cbebpg/CheckMeENC",
+					"protocol": "https",
+					"host": [
+						"cbebirrpaymentgateway",
+						"cbe",
+						"com",
+						"et"
+					],
+					"port": "8888",
+					"path": [
+						"api",
+						"cbebpg",
+						"CheckMeENC"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.Check If Encryption works as Required",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"TillCode\": 870087,\r\n    \"MName\": \"iTwDiFZRmUQa07orGuI+sA==\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://cbebirrpaymentgateway.cbe.com.et:8888/api/cbebpg/CheckMeDEC",
+					"protocol": "https",
+					"host": [
+						"cbebirrpaymentgateway",
+						"cbe",
+						"com",
+						"et"
+					],
+					"port": "8888",
+					"path": [
+						"api",
+						"cbebpg",
+						"CheckMeDEC"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

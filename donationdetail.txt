@@ -1,0 +1,553 @@
+@{
+  Layout = "~/Views/Shared/LayoutPages.cshtml"; ViewData["Title"] = ViewBag.Donation.Title;
+}
+
+<style>
+  .single-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+  .single-wrapper .box {
+    z-index: 10;
+    width: 400px;
+    height: 400px;
+    border-radius: 15px;
+    transition: transform 500ms ease-out;
+    overflow: hidden;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .box h2 {
+    font-size: 25px;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .box p {
+    line-height: 1.9;
+
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .box .more {
+    border: none;
+    background: #fff;
+    padding: 15px 50px;
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+
+    font-size: 16px;
+    border-radius: 50px;
+  }
+  .single-wrapper .box::before {
+    content: "";
+    background: rgba(255, 255, 255, 0.3);
+    width: 60%;
+    height: 100%;
+    top: 0%;
+    left: -125%;
+    transform: skew(45deg);
+    position: absolute;
+    animation-direction: left;
+    transition-duration: 500ms;
+  }
+  .single-wrapper .box:hover {
+    transform: translateY(-5%);
+  }
+  .single-wrapper .box:hover::before {
+    left: 150%;
+  }
+  .card-header .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    padding: 0.5rem;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    transition: background-color 0.3s ease;
+  }
+
+  /* Style the close button on hover */
+  .card-header .close:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Style the close button symbol */
+  .card-header .close span {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+</style>
+<div
+  class="share-btn-container share-btn"
+  data-title="Let's donate for @ViewBag.Donation.Title"
+>
+  <a class="fb-btn" data-id="fb">
+    <i class="bi bi-facebook"></i>
+  </a>
+  <a class="tw-btn" data-id="tw">
+    <i class="bi bi-twitter"></i>
+  </a>
+  <a class="li-btn" data-id="in">
+    <i class="bi bi-linkedin"></i>
+  </a>
+  <a class="tg-btn" data-id="tg">
+    <i class="bi bi-telegram"></i>
+  </a>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-12 my-4">
+      <div
+        class="alert alert-primary hidden"
+        role="alert"
+        id="androidNotification"
+      ></div>
+      <h1 class="text-light">@ViewBag.Donation.Title</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-8 col-12">
+      <img src="~/uploads/@ViewBag.Donation.Poster" class="w-100 rounded" />
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="d-fixed">
+        <div class="card">
+          <div class="card-body">
+            <h3>
+              @ViewBag.Donation.AmountDonated raised of
+              @ViewBag.Donation.AmountRequired goal
+            </h3>
+            <div class="progress my-3" style="height: 5px">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                style="width: @(ViewBag.Donation.Percentage) %"
+                aria-valuenow="45"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+            <p>@ViewBag.data.DonatorsCount donations</p>
+
+            <button
+              type="button"
+              class="d-block w-100 my-2 btn btn-primary"
+              onclick="share()"
+            >
+              Share
+            </button>
+ <div class="form-group">
+  <label for="donation-amount">Donation Amount:</label>
+  <input type="number" class="form-control" id="donation-amount" name="donation-amount" min="10" max="@(Double.Parse(ViewBag.Donation.AmountRequired) - Double.Parse(ViewBag.Donation.AmountDonated))" required value="10">
+</div>        <button type="button" class="btn d-block w-100 my-2 btn-primary" onclick="donate()">Donate</button>
+           <!-- select payment modal--> 
+<div id="modalCard" class="card" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; width: 400px;">
+  <div class="card-header bg-primary text-white">
+    <h5 class="card-title mb-0">Select Payment Method</h5>
+    <button type="button" class="close" aria-label="Close" onclick="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="card-body">
+    <button type="button" class="btn btn-primary mb-2" onclick="payWithCBEBirr()">CBE Birr</button>
+    <button type="button" class="btn btn-primary" onclick="payWithCreaditCard()">Credit Card</button>
+  </div>
+</div>
+
+
+
+<script>
+  function openModal() {
+    // Get the modal card element
+    var modalCard = document.getElementById("modalCard");
+
+    // Display the modal card
+    modalCard.style.display = "block";
+  }
+
+
+  function closeModal() {
+    // Get the modal card element
+    var modalCard = document.getElementById("modalCard");
+
+    // Hide the modal card
+    modalCard.style.display = "none";
+  }
+  </script>
+            <div class="d-flex align-items-center my-3">
+              <div
+                class="d-flex justify-content-center align-items-center me-3 border"
+                style="width: 40px; height: 40px; border-radius: 20px"
+              >
+                <span><i class="fa fa-user fs-3"></i></span>
+              </div>
+              <div>
+                <p class="mb-1">@ViewBag.data.LastDonatorName</p>
+                <div class="d-flex">
+                  <p class="mb-1 me-2">@(ViewBag.data.LastDonationAmount)ETB</p>
+                  <a href="#" class="mb-1">Recent Donation</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8 col-12 my-4">
+      <div class="d-flex align-items-center">
+        <div
+          class="d-flex justify-content-center align-items-center me-3 border"
+          style="width: 40px; height: 40px; border-radius: 20px"
+        >
+          <span><i class="fa fa-user fs-3"></i></span>
+        </div>
+        <div>
+          <p class="mb-0 text-light fs-3">
+            @ViewBag.data.CompanyName is organizing this fund raiser
+          </p>
+        </div>
+      </div>
+      <hr class="bg-secondary" />
+      <div class="d-flex align-items-center justify-content-between">
+        <p class="text-secondary mb-0">
+          Ends in <span id="exp_days">0</span> Days
+        </p>
+        <p class="text-secondary mb-0 fs-4">
+          Code | @ViewBag.data.SpecialShorCode
+        </p>
+      </div>
+      <hr class="bg-secondary" />
+      <p class="text-white" id="desc">@ViewBag.Donation.Description</p>
+      <div class="d-flex my-4">
+        <button
+          type="button"
+          class="mx-2 btn btn-primary"
+          style="flex: 1"
+          onclick="share()"
+        >
+          Share
+        </button>
+        <button
+          type="button"
+          class="mx-2 btn btn-primary"
+          style="flex: 1"
+          onclick="donate()"
+        >
+          Donate
+        </button>
+      </div>
+    </div>
+    <div class="col-lg-4"></div>
+    <div class="col-lg-8 col-12">
+      <hr class="bg-secondary" />
+      <h2 class="fs-1 text-light my-7">Organizer</h2>
+      <div class="d-flex">
+        <div
+          class="d-flex justify-content-center align-items-center me-3 border my-1"
+          style="width: 40px; height: 40px; border-radius: 20px"
+        >
+          <span><i class="fa fa-user fs-3"></i></span>
+        </div>
+        <div>
+          <p class="mb-0 text-light fs-3">@ViewBag.data.CompanyName</p>
+          <p class="mb-0 text-muted fs-5">Organizer</p>
+          <p class="mb-0 text-muted fs-5">
+            @ViewBag.data.Location | @ViewBag.data.Phone | @ViewBag.data.POBOX
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@if (ViewBag.payment)
+{
+      <div class="payment-status">
+        <div
+        class="modal"
+        id="paymentModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="paymentModalTitle"
+        aria-hidden="false"
+      >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Payment Status</h5>
+            </div>
+            <div class="modal-body">
+            @if (ViewBag.paymentSuccessful)
+            {
+                    <h2>@ViewBag.amount birr is successfully donated.</h2>
+            }
+            else
+            {
+                    <h2>Donation Failed</h2>
+            }
+            </div>
+          </div>
+        </div>
+
+        </div>
+      </div>
+}
+
+<div
+  class="modal fade"
+  id="donationModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="donationModalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Donate</h5>
+        <button
+          type="button"
+          class="btn close modal-close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="user-form">
+          <form id="cc-form" class="paymentWidgets" data-brands="VISA MASTER AMEX">          
+          </form>
+        </div>
+        <div class="form-loading">
+          <div
+            class="spinner-border"
+            style="width: 3rem; height: 3rem"
+            role="status"
+          >
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+        <div class="form-completed">
+          <i class="bi bi-check-circle-fill text-primary fs-1 py-3"></i>
+          <h4>Thanks for donating!!</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="~/js/jquery.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/share-buttons/dist/share-buttons.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/imask/3.4.0/imask.min.js"></script>
+<script src="~/js/creaditcardform.js"></script>
+<script>
+  Object.defineProperty(window, 'resDesc', {
+        configurable: true,
+        set(value) {
+        if (value != undefined && value != null && value != "") 
+          {
+            document.getElementById("txnResponse").innerHTML = value;
+          }
+        Object.defineProperty(window, 'resDesc', { value });
+        }
+      });
+  var container = $(".share-btn-container");
+  $(".form-loading").hide();
+  $(".form-completed").hide();
+  $(document).ready(function() {
+    if($("#paymentModal")){
+        $("#paymentModal").modal("show");
+        $("#paymentModal").on('hidden.bs.modal', function() {
+          window.location.href = "https://localhost:7123";
+        })
+      }
+  })
+
+  $(".modal-close").on("click", function () {
+    $("#donationModal").modal("toggle");
+    $(".form-loading").hide();
+    $(".form-completed").hide();
+    $(".user-form").show();
+  });
+  $(".submit-form").on("click", function () {
+    $(".form-loading").show();
+    $(".user-form").hide();
+    try {
+      const data = {
+        id: "@ViewBag.Donation.id",
+        title: "@ViewBag.Donation.Title",
+        compnay: "@ViewBag.data.CompanyName",
+        shortcode: "@ViewBag.data.SpecialShorCode",
+        donatorname: $("#name").val(),
+        donatorphone: $("#phone").val(),
+      };
+      SnackBar.postMessage(JSON.stringify(data));
+    } catch (e) {
+      setTimeout(function () {
+        $(".form-loading").hide();
+        $(".form-completed").show();
+      }, 3000);
+    }
+  });
+  container.hide();
+  $(document).mouseup(function (e) {
+    // if the target of the click isn't the container nor a descendant of the container
+    if (!container.is(e.target) && container.has(e.target).length === 0) {
+      container.hide();
+    }
+  });
+  var f = "@ViewBag.data.DontaionEndDate";
+  var days = document.getElementById("exp_days");
+  var days_difference = "a";
+
+  if (f.split("-").length === 3) {
+    var date = new Date(f);
+    var now = new Date();
+    days_difference = parseInt(
+      (date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    days.innerText = days_difference;
+  }
+  var description = document.getElementById("desc");
+  var desc = description.innerText;
+  if (description.innerText.length > 200) {
+    var i = `<span class="mx-2 text-primary" onclick="readMore()">... Read More</span>`;
+    description.innerHTML = `<p>${description.innerText.substr(
+      0,
+      200
+    )}</p>${i}`;
+  }
+  function readMore() {
+    var i = `<span class="mx-2 text-primary" onclick="readLess()"> Read Less</span>`;
+    description.innerHTML = `<p>${desc}</p>${i}`;
+  }
+  function readLess() {
+    if (description.innerText.length > 200) {
+      var i = `<span class="mx-2 text-primary" onclick="readMore()">... Read More</span>`;
+      description.innerHTML = `<p>${desc.substr(0, 200)}</p>${i}`;
+    }
+  }
+  function reciveMessage(message) {
+    $(".form-completed > h4").text(message);
+    setTimeout(function () {
+      $(".form-loading").hide();
+      $(".form-completed").show();
+    }, 2000);
+  }
+async function donate() {
+    var dontaion_amount = $("#donation-amount");
+    var optionform = $("#modalCard");
+    var ccform = $("#cc-form");
+    console.log("hey")
+
+    if(dontaion_amount.val() >= dontaion_amount.attr("min") && dontaion_amount.val() <= dontaion_amount.attr("max")){
+      let is_authenticated = await isAuthenticated();      
+      if(is_authenticated){
+        optionform.show();
+        return;
+      }
+
+      payWithCreaditCard();
+
+    }
+
+
+  }
+   async function payWithCreaditCard(){
+    $("#modalCard").hide();
+    var ccform = $("#cc-form");
+    var dontaion_amount = $("#donation-amount");
+    $(".form-loading").show();
+    try{
+      const response = await $.ajax({
+        url: "https://localhost:7123/api/payment/pay",
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({amount: parseFloat(dontaion_amount.val())}),
+        });
+      if(response.success){
+        var script = document.createElement('script');
+        script.src = 'https://test.oppwa.com/v1/paymentWidgets.js?checkoutId='+response.message;
+        script.type = 'text/javascript';
+        ccform.attr("action", window.location.href);
+        var iframe = document.createElement('iframe');
+        iframe.src = "https://test.oppwa.com/v1/pciIframe.html?checkoutId=" + response.message;
+        iframe.className = "wpwl-control wpwl-control-iframe wpwl-control-cardNumber wpwl-has-error"
+        ccform.append(script);
+        $(".form-loading").hide();
+        $("#donationModal").modal("toggle");
+        }
+        else{
+          $(".form-loading").hide();
+            alert("an error occured.");
+        }
+    }
+    catch (ex) {
+      $(".form-loading").hide();
+      console.error("An error occured." + ex)
+    }
+  }
+  function share() {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "@ViewBag.Donation.Title",
+          url: document.location,
+        })
+        .then(() => console.log("Thanks for Sharing!"));
+    } else {
+      container.show();
+    }
+  }
+   async function  isAuthenticated(){
+
+    var return_value = false;
+    try{
+
+      const response =  await fetch("/Home/IsAuthenticated");
+      const data = await response.json();
+      return_value = data.success;
+    }
+    catch(error){
+      console.error(error)
+    }
+    return return_value;
+  }
+  async function getEncryptedData(amount) {
+    let response = null;
+    const urlsearchparam = new URLSearchParams(window.location.search);
+    let id=urlsearchparam.get("id");
+    try{
+      response = await $.ajax({
+            url: "/Home/GetEncryptedMessage",
+            type: "POST",
+            data: JSON.stringify({amount: amount, id}),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+          });
+      console.log(response);
+    }
+    catch(error){
+      console.error(error)
+    }
+    
+    return response
+  }
+async function payWithCBEBirr(){
+    $("#donationModal").modal("hide");
+    $("#modalCard").hide();
+    let amount  = $("#donation-amount").val();
+    const encrypted_data = await getEncryptedData(amount);
+    if(encrypted_data){
+      window.myJsChannel.postMessage(encrypted_data.data);
+    }
+
+  }
+</script>
